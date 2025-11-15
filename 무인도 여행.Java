@@ -17,73 +17,57 @@ class Solution {
         for(int i = 0; i < maps.length; i++){
             for(int j = 0; j < maps[0].length(); j++){
                 maps_int[i][j] = (maps[i].charAt(j)) == 'X'? 0:(maps[i].charAt(j))-'0';
-                System.out.printf("%d \n",maps_int[i][j]);
             }
         }
-        
-        
-        int x = 0;
-        int y = 0;
-        int sum = 0;
+      
         List<Integer> answer_list = new ArrayList<>();
         
-        while(visited(visited_total)){
-            // 현재 위치가 x이면 건너뛰기
-            if(maps_int[x][y] == 0){ 
-                visited_total[x][y] = true;
-            }else{
-                sum += maps_int[x][y];
-                //visited[x][y] = true;
-                visited_total[x][y] = true;
-                dfs(x,y,maps_int,visited_total);  
-                break;
+        for(int i = 0; i < visited_total.length; i++ ){
+            for(int j = 0; j < visited_total[0].length; j++){ 
+                
+                // 현재 위치가 x이면 건너뛰기
+                if(maps_int[i][j] == 0){ 
+                    visited_total[i][j] = true;
+                }else if(!visited_total[i][j]){
+                    sum += maps_int[i][j];
+                    visited_total[i][j] = true;
+                    dfs(i,j,maps_int,visited_total);  
+                }
+
+                if(sum != 0){
+                    answer_list.add(sum);
+                    sum = 0;
+                } 
+
             }
-            
-            if(sum != 0) answer_list.add(sum);
-            
         }
-       
-        int[] answer = {1,1};
+        
+        answer_list.sort(Comparator.naturalOrder());
+        
+        int[] answer = answer_list.isEmpty()? new int[]{-1}: answer_list.stream().mapToInt(i -> i).toArray();
         return answer;
     }
     
     
-    void dfs(int start_x, int start_y,int[][] maps_int,boolean[][] visited_total){
-        
-        int[] dx = new int[]{0,0,1,-1};
-        int[] dy = new int[]{1,-1,0,0};
-    
-        for(int i = 0; i < 4; i++){
-            
-            int x = start_x;
-            int y = start_y;
-            
-            x += dx[i];
-            y += dy[i];
-            
-            if( x < 0 || y < 0 || x >= maps_int.length || y >= maps_int[0].length ) continue;
-            
-            if(maps_int[x][y] != 0 && visited_total[x][y] != true){
-                sum += maps_int[x][y];
-                //visited[x][y] = true;
-                visited_total[x][y] = true;
-                dfs(x,y,maps_int,visited_total);
-            }else if(maps_int[x][y] == 0 && visited_total[x][y] != true){
-                visited_total[x][y] = true;
+    void dfs(int x, int y, int[][] maps_int, boolean[][] visited_total) {
+
+        int[] dx = new int[]{0, 0, 1, -1};
+        int[] dy = new int[]{1, -1, 0, 0};
+
+        for (int i = 0; i < 4; i++) {
+
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            // 범위 체크
+            if (nx < 0 || ny < 0 || nx >= maps_int.length || ny >= maps_int[0].length) continue;
+
+            // 바다(X)가 아니고, 아직 방문 안 했으면 계속 탐색
+            if (maps_int[nx][ny] != 0 && !visited_total[nx][ny]) {
+                sum += maps_int[nx][ny];
+                visited_total[nx][ny] = true;
+                dfs(nx, ny, maps_int, visited_total);
             }
-            
-        }   
-        
+        }
     }
-    
-    boolean visited(boolean[][] visited_total){
-     for(boolean[] row : visited_total){
-            for(boolean value : row){
-                if(!value) return true;
-            }
-        }   
-        
-        return false;
-    }
-    
 }
